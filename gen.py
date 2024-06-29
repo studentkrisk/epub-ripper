@@ -1,19 +1,12 @@
-out = ""
-for i in range(630):
-    d = ""
-    title = ""
-    with open(f"chaps/chap{i}.html", "r") as f:
-        d = f.read()
-        # f.seek(0)
-        d = d[d.index("<article"):d.index("</article") + len("</article")]
-        title = d[d.index('<h1 class="entry-title">') + len('<h1 class="entry-title">'):d.index("</h1>")]
-        d = list(filter(lambda x : x[:2] == "<p", d.split("\n")))
-        # f.write(d)
-        # f.truncate()
-    out += f"<h1>{title}</h1>"
-    out += "\n".join(d)
-    print(i/630)
-with open("out.html", "w") as f:
-    f.write(out)
+import json
+d = {}
+with open("kemono_su_api.json", "r") as f:
+    d = json.load(f)[::-1]
+d = list(filter(lambda x : x['title'][:2] == "B4" or "Book 4" in x['title'], d))
 
-# print(subprocess.check_output([f"echo '{out}' | pandoc -f html -t epub -o apge.epub --metadata title='A Practical Guide to Evil'"]))
+with open("out2.html", "w") as f:
+    for i in d:
+        f.write(f"<h1>Chapter {d.index(i)+1}: {i['title'].replace(' - ', ': ').split(': ')[-1]}</h1>\n")
+        f.write(i['content'])
+
+# pandoc -f html -t epub -o ats4.epub --metadata title='All the Skills Book 4' out2.html
